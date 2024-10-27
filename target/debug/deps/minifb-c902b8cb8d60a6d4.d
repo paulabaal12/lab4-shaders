@@ -1,0 +1,12 @@
+C:\Users\rebe1\OneDrive\Documentos\GitHub\lab4-shaders\target\debug\deps\libminifb-c902b8cb8d60a6d4.rmeta: C:\Users\rebe1\.cargo\registry\src\index.crates.io-6f17d22bba15001f\minifb-0.26.0\src\lib.rs C:\Users\rebe1\.cargo\registry\src\index.crates.io-6f17d22bba15001f\minifb-0.26.0\src\error.rs C:\Users\rebe1\.cargo\registry\src\index.crates.io-6f17d22bba15001f\minifb-0.26.0\src\icon.rs C:\Users\rebe1\.cargo\registry\src\index.crates.io-6f17d22bba15001f\minifb-0.26.0\src\key.rs C:\Users\rebe1\.cargo\registry\src\index.crates.io-6f17d22bba15001f\minifb-0.26.0\src\key_handler.rs C:\Users\rebe1\.cargo\registry\src\index.crates.io-6f17d22bba15001f\minifb-0.26.0\src\os\mod.rs C:\Users\rebe1\.cargo\registry\src\index.crates.io-6f17d22bba15001f\minifb-0.26.0\src\os\windows\mod.rs C:\Users\rebe1\.cargo\registry\src\index.crates.io-6f17d22bba15001f\minifb-0.26.0\src\rate.rs
+
+C:\Users\rebe1\OneDrive\Documentos\GitHub\lab4-shaders\target\debug\deps\minifb-c902b8cb8d60a6d4.d: C:\Users\rebe1\.cargo\registry\src\index.crates.io-6f17d22bba15001f\minifb-0.26.0\src\lib.rs C:\Users\rebe1\.cargo\registry\src\index.crates.io-6f17d22bba15001f\minifb-0.26.0\src\error.rs C:\Users\rebe1\.cargo\registry\src\index.crates.io-6f17d22bba15001f\minifb-0.26.0\src\icon.rs C:\Users\rebe1\.cargo\registry\src\index.crates.io-6f17d22bba15001f\minifb-0.26.0\src\key.rs C:\Users\rebe1\.cargo\registry\src\index.crates.io-6f17d22bba15001f\minifb-0.26.0\src\key_handler.rs C:\Users\rebe1\.cargo\registry\src\index.crates.io-6f17d22bba15001f\minifb-0.26.0\src\os\mod.rs C:\Users\rebe1\.cargo\registry\src\index.crates.io-6f17d22bba15001f\minifb-0.26.0\src\os\windows\mod.rs C:\Users\rebe1\.cargo\registry\src\index.crates.io-6f17d22bba15001f\minifb-0.26.0\src\rate.rs
+
+C:\Users\rebe1\.cargo\registry\src\index.crates.io-6f17d22bba15001f\minifb-0.26.0\src\lib.rs:
+C:\Users\rebe1\.cargo\registry\src\index.crates.io-6f17d22bba15001f\minifb-0.26.0\src\error.rs:
+C:\Users\rebe1\.cargo\registry\src\index.crates.io-6f17d22bba15001f\minifb-0.26.0\src\icon.rs:
+C:\Users\rebe1\.cargo\registry\src\index.crates.io-6f17d22bba15001f\minifb-0.26.0\src\key.rs:
+C:\Users\rebe1\.cargo\registry\src\index.crates.io-6f17d22bba15001f\minifb-0.26.0\src\key_handler.rs:
+C:\Users\rebe1\.cargo\registry\src\index.crates.io-6f17d22bba15001f\minifb-0.26.0\src\os\mod.rs:
+C:\Users\rebe1\.cargo\registry\src\index.crates.io-6f17d22bba15001f\minifb-0.26.0\src\os\windows\mod.rs:
+C:\Users\rebe1\.cargo\registry\src\index.crates.io-6f17d22bba15001f\minifb-0.26.0\src\rate.rs:

@@ -1,4 +1,3 @@
-// src/main.rs
 use nalgebra_glm::{Vec3, Mat4, look_at, perspective};
 use minifb::{Key, Window, WindowOptions};
 use std::time::Duration;
@@ -21,13 +20,56 @@ use triangle::triangle;
 use shaders::{vertex_shader, fragment_shader};
 use fastnoise_lite::{FastNoiseLite, NoiseType};
 
+#[derive(Clone, Copy)]
+pub enum CelestialBody {
+    Sun,
+    RockyPlanet,
+    GasGiant,
+    CloudyPlanet,
+    RingedPlanet,
+    IcePlanet,
+    ColorPlanet,
+    Moon,
+}
+
 pub struct Uniforms {
     model_matrix: Mat4,
     view_matrix: Mat4,
     projection_matrix: Mat4,
     viewport_matrix: Mat4,
     time: u32,
-    noise: FastNoiseLite
+    noise: FastNoiseLite,
+    current_body: CelestialBody,  
+}
+
+#[derive(Clone, Copy)]
+pub struct Moon {
+    position: Vec3,
+    scale: f32,
+    rotation: Vec3,
+    orbit_angle: f32,
+    orbit_radius: f32,
+    orbit_speed: f32,
+}
+
+impl Moon {
+    fn new() -> Self {
+        Moon {
+            position: Vec3::new(0.0, 0.0, 0.0),
+            scale: 0.3,
+            rotation: Vec3::new(0.0, 0.0, 0.0),
+            orbit_angle: 0.0,
+            orbit_radius: 2.0,
+            orbit_speed: 0.02,
+        }
+    }
+
+    fn update(&mut self) {
+        self.orbit_angle += self.orbit_speed;
+        self.position.x = self.orbit_angle.cos() * self.orbit_radius;
+        self.position.z = self.orbit_angle.sin() * self.orbit_radius;
+        self.rotation.y += 0.01;
+    }
 }
 
 fn create_noise() -> FastNoiseLite {
@@ -97,14 +139,12 @@ fn create_viewport_matrix(width: f32, height: f32) -> Mat4 {
 }
 
 fn render(framebuffer: &mut Framebuffer, uniforms: &Uniforms, vertex_array: &[Vertex]) {
-    // Vertex Shader
     let mut transformed_vertices = Vec::with_capacity(vertex_array.len());
     for vertex in vertex_array {
         let transformed = vertex_shader(vertex, uniforms);
         transformed_vertices.push(transformed);
     }
 
-    // Primitive Assembly
     let mut triangles = Vec::new();
     for i in (0..transformed_vertices.len()).step_by(3) {
         if i + 2 < transformed_vertices.len() {
@@ -116,13 +156,11 @@ fn render(framebuffer: &mut Framebuffer, uniforms: &Uniforms, vertex_array: &[Ve
         }
     }
 
-    // Rasterization
     let mut fragments = Vec::new();
     for tri in &triangles {
         fragments.extend(triangle(&tri[0], &tri[1], &tri[2]));
     }
 
-    // Fragment Processing
     for fragment in fragments {
         let x = fragment.position.x as usize;
         let y = fragment.position.y as usize;
@@ -136,16 +174,90 @@ fn render(framebuffer: &mut Framebuffer, uniforms: &Uniforms, vertex_array: &[Ve
     }
 }
 
+fn handle_input(window: &Window, camera: &mut Camera) {
+    let movement_speed = 1.0;
+    let rotation_speed = PI/50.0;
+    let zoom_speed = 0.1;
+   
+    if window.is_key_down(Key::Left) {
+        camera.orbit(rotation_speed, 0.0);
+    }
+    if window.is_key_down(Key::Right) {
+        camera.orbit(-rotation_speed, 0.0);
+    }
+    if window.is_key_down(Key::W) {
+        camera.orbit(0.0, -rotation_speed);
+    }
+    if window.is_key_down(Key::S) {
+        camera.orbit(0.0, rotation_speed);
+    }
+
+    let mut movement = Vec3::new(0.0, 0.0, 0.0);
+    if window.is_key_down(Key::A) {
+        movement.x -= movement_speed;
+    }
+    if window.is_key_down(Key::D) {
+        movement.x += movement_speed;
+    }
+    if window.is_key_down(Key::Q) {
+        movement.y += movement_speed;
+    }
+    if window.is_key_down(Key::E) {
+        movement.y -= movement_speed;
+    }
+    if movement.magnitude() > 0.0 {
+        camera.move_center(movement);
+    }
+
+    if window.is_key_down(Key::Up) {
+        camera.zoom(zoom_speed);
+    }
+    if window.is_key_down(Key::Down) {
+        camera.zoom(-zoom_speed);
+    }
+}
+
+fn handle_celestial_body_change(window: &Window, current_body: &mut CelestialBody) {
+    if window.is_key_pressed(Key::Key1, minifb::KeyRepeat::No) {
+        *current_body = CelestialBody::Sun;
+        println!("Switched to: Sun");
+    }
+    if window.is_key_pressed(Key::Key2, minifb::KeyRepeat::No) {
+        *current_body = CelestialBody::RockyPlanet;
+        println!("Switched to: Rocky Planet");
+    }
+    if window.is_key_pressed(Key::Key3, minifb::KeyRepeat::No) {
+        *current_body = CelestialBody::GasGiant;
+        println!("Switched to: Gas Giant");
+    }
+    if window.is_key_pressed(Key::Key4, minifb::KeyRepeat::No) {
+        *current_body = CelestialBody::CloudyPlanet;
+        println!("Switched to: Cloudy Planet");
+    }
+    if window.is_key_pressed(Key::Key5, minifb::KeyRepeat::No) {
+        *current_body = CelestialBody::RingedPlanet;
+        println!("Switched to: Ringed Planet");
+    }
+    if window.is_key_pressed(Key::Key6, minifb::KeyRepeat::No) {
+        *current_body = CelestialBody::IcePlanet;
+        println!("Switched to: Ice Planet");
+    }
+    if window.is_key_pressed(Key::Key7, minifb::KeyRepeat::No) {
+        *current_body = CelestialBody::ColorPlanet;
+        println!("Switched to: Color Planet");
+    }
+}
+
 fn main() {
-    let window_width = 800;
-    let window_height = 600;
-    let framebuffer_width = 800;
-    let framebuffer_height = 600;
+    let window_width = 760;
+    let window_height = 800;
+    let framebuffer_width = 760;
+    let framebuffer_height = 800;
     let frame_delay = Duration::from_millis(16);
 
     let mut framebuffer = Framebuffer::new(framebuffer_width, framebuffer_height);
     let mut window = Window::new(
-        "Celestial Renderer",
+        "Cuerpos Celestes",
         window_width,
         window_height,
         WindowOptions::default(),
@@ -155,23 +267,31 @@ fn main() {
     window.set_position(500, 500);
     window.update();
 
-    framebuffer.set_background_color(0x333355);
+    framebuffer.set_background_color(0x000015);
 
-    // model position
     let translation = Vec3::new(0.0, 0.0, 0.0);
-    let rotation = Vec3::new(0.0, 0.0, 0.0);
+    let mut rotation = Vec3::new(0.0, 0.0, 0.0);
     let scale = 1.0f32;
 
-    // camera parameters
     let mut camera = Camera::new(
         Vec3::new(0.0, 0.0, 5.0),
         Vec3::new(0.0, 0.0, 0.0),
         Vec3::new(0.0, 1.0, 0.0)
     );
 
-    let obj = Obj::load("assets/esfera.obj").expect("Failed to load obj");
-    let vertex_arrays = obj.get_vertex_array(); 
+    let obj = Obj::load("assets/sphere.obj").expect("Failed to load obj");
+    let vertex_arrays = obj.get_vertex_array();
+    
     let mut time = 0;
+    let mut current_body = CelestialBody::CloudyPlanet;
+    let mut moon = Moon::new();
+
+    println!("Controls:");
+    println!("1-7: Switch between celestial bodies");
+    println!("WASD: Orbit camera");
+    println!("QE: Move camera up/down");
+    println!("Arrow keys: Zoom and rotate");
+    println!("ESC: Exit");
 
     while window.is_open() {
         if window.is_key_down(Key::Escape) {
@@ -179,8 +299,10 @@ fn main() {
         }
 
         time += 1;
+        rotation.y += 0.01;
 
         handle_input(&window, &mut camera);
+        handle_celestial_body_change(&window, &mut current_body);
 
         framebuffer.clear();
 
@@ -189,68 +311,46 @@ fn main() {
         let view_matrix = create_view_matrix(camera.eye, camera.center, camera.up);
         let projection_matrix = create_perspective_matrix(window_width as f32, window_height as f32);
         let viewport_matrix = create_viewport_matrix(framebuffer_width as f32, framebuffer_height as f32);
+        
         let uniforms = Uniforms { 
             model_matrix, 
             view_matrix, 
             projection_matrix, 
             viewport_matrix,
             time,
-            noise
+            noise,
+            current_body,
         };
 
-        framebuffer.set_current_color(0xFFDDDD);
         render(&mut framebuffer, &uniforms, &vertex_arrays);
+
+        // Renderizar la luna 
+        if let CelestialBody::CloudyPlanet = current_body {
+            moon.update();
+            
+            let moon_model_matrix = create_model_matrix(
+                moon.position,
+                moon.scale,
+                moon.rotation
+            );
+
+            let moon_uniforms = Uniforms {
+                model_matrix: moon_model_matrix,
+                view_matrix,
+                projection_matrix,
+                viewport_matrix,
+                time,
+                noise: create_noise(),
+                current_body: CelestialBody::Moon,
+            };
+
+            render(&mut framebuffer, &moon_uniforms, &vertex_arrays);
+        }
 
         window
             .update_with_buffer(&framebuffer.buffer, framebuffer_width, framebuffer_height)
             .unwrap();
 
         std::thread::sleep(frame_delay);
-    }
-}
-
-fn handle_input(window: &Window, camera: &mut Camera) {
-    let movement_speed = 1.0;
-    let rotation_speed = PI/50.0;
-    let zoom_speed = 0.1;
-   
-    //  camera orbit controls
-    if window.is_key_down(Key::Left) {
-      camera.orbit(rotation_speed, 0.0);
-    }
-    if window.is_key_down(Key::Right) {
-      camera.orbit(-rotation_speed, 0.0);
-    }
-    if window.is_key_down(Key::W) {
-      camera.orbit(0.0, -rotation_speed);
-    }
-    if window.is_key_down(Key::S) {
-      camera.orbit(0.0, rotation_speed);
-    }
-
-    // Camera movement controls
-    let mut movement = Vec3::new(0.0, 0.0, 0.0);
-    if window.is_key_down(Key::A) {
-      movement.x -= movement_speed;
-    }
-    if window.is_key_down(Key::D) {
-      movement.x += movement_speed;
-    }
-    if window.is_key_down(Key::Q) {
-      movement.y += movement_speed;
-    }
-    if window.is_key_down(Key::E) {
-      movement.y -= movement_speed;
-    }
-    if movement.magnitude() > 0.0 {
-      camera.move_center(movement);
-    }
-
-    // Camera zoom controls
-    if window.is_key_down(Key::Up) {
-      camera.zoom(zoom_speed);
-    }
-    if window.is_key_down(Key::Down) {
-      camera.zoom(-zoom_speed);
     }
 }

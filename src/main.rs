@@ -30,6 +30,9 @@ pub enum CelestialBody {
     IcePlanet,
     ColorPlanet,
     Moon,
+    OceanPlanet,    
+    NaturePlanet,   
+    AuroraPlanet, 
 }
 
 pub struct Uniforms {
@@ -249,6 +252,18 @@ fn handle_celestial_body_change(window: &Window, current_body: &mut CelestialBod
     if window.is_key_pressed(Key::Key8, minifb::KeyRepeat::No) {
         *current_body = CelestialBody::Moon;
         println!("Switched to: Moon");
+    }
+    if window.is_key_pressed(Key::Key9, minifb::KeyRepeat::No) {
+        *current_body = CelestialBody::OceanPlanet;
+        println!("Switched to: Ocean Planet");
+    }
+    if window.is_key_pressed(Key::Key0, minifb::KeyRepeat::No) {
+        *current_body = CelestialBody::NaturePlanet;
+        println!("Switched to: Nature Planet");
+    }
+    if window.is_key_pressed(Key::B, minifb::KeyRepeat::No) {
+        *current_body = CelestialBody::AuroraPlanet;
+        println!("Switched to: Aurora Planet");
     }
 }
 

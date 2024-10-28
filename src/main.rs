@@ -246,6 +246,10 @@ fn handle_celestial_body_change(window: &Window, current_body: &mut CelestialBod
         *current_body = CelestialBody::ColorPlanet;
         println!("Switched to: Color Planet");
     }
+    if window.is_key_pressed(Key::Key8, minifb::KeyRepeat::No) {
+        *current_body = CelestialBody::Moon;
+        println!("Switched to: Moon");
+    }
 }
 
 fn main() {
